@@ -1,0 +1,15 @@
+function findFirst(array, el)
+	len = size(array, 2)
+	mid = len / 2
+	while el != array[mid]
+		if el < array[mid]
+			mid /= 2
+		elseif el > array[mid]
+			mid += mid / 2
+	end
+	while el == array[mid]
+		mid -= 1
+	end
+	return mid + 1
+end
+	     
