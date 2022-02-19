@@ -1,0 +1,28 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, min_s; cin >> n; min_s = 3001;
+    vector<vector<int>> values(n, vector<int>(n));
+    for (int i = 0; i < n; ++i){
+        for (int j = 0; j < n; ++j){
+            cin >> values[i][j];
+        }
+    }
+
+    for (int i = 0; i < n; ++i){
+        for (int j = i + 1; j < n; ++j){
+            int cur_sum = values[i][j];
+            int min_sum = 3001;
+            for (int k = 0; k < n; ++k){
+                if (values[j][k] != 0 && values[k][i] != 0 && (values[j][k] + values[k][i]) < min_sum){
+                    min_sum = values[j][k] + values[k][i];
+                }
+            }
+            cur_sum += min_sum;
+            min_s = min(min_s, cur_sum);
+        }
+    }
+    cout << min_s;
+    return 0;
+}
