@@ -1,0 +1,16 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int tunnels, n; cin >> n >> tunnels;
+    vector<int> crosses(n, 0);
+    for (int i = 0; i < tunnels; ++i){
+        int a, b; cin >> a >> b;
+        crosses[a - 1] += 1;
+        crosses[b - 1] += 1;
+    }
+    for (auto& a : crosses){
+        cout << a << " ";
+    }
+    return 0;
+}
