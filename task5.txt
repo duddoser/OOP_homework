@@ -1,0 +1,21 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n, m, k, max_len = 0; cin >> n >> m >> k;
+    vector<vector<int>> cells(n, vector<int>(m, 0));
+    vector<int> close_corner(4, 10000);
+    for (int i = 0; i < k; ++i){
+        int a, b;
+        cin >> a >> b;
+        close_corner[0] = min(a + b - 2, close_corner[0]);
+        close_corner[1] = min(a + (m - b) - 2, close_corner[1]);
+        close_corner[2] = min((n - a) + b - 2, close_corner[2]);
+        close_corner[3] = min((n - a) + (m - b) - 2, close_corner[3]);
+        cells[a - 1][b - 1] = 1;
+    }
+
+    
+
+    return 0;
+}
