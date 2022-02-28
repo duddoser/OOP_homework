@@ -1,0 +1,36 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> rem(1200, 0);
+vector<vector<int>> crosses(1200);
+
+bool find_cycle(int cur, int last){
+    rem[cur] = 1;
+    for (auto& v: crosses[cur]){
+        if (rem[v] == 0){
+            find_cycle(v, cur);
+        } else if (v != last) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int main() {
+    int n, m; cin >> n >> m;
+
+    for (int i = 0; i < m; ++i){
+        int a, b; cin >> a >> b;
+        if (find(crosses[a].begin(), crosses[a].end(), b) == crosses[a].end()){
+            crosses[a].push_back(b);
+            crosses[b].push_back(a);
+        }
+    }
+
+    if (find_cycle(1, 0)){
+        cout << "YES";
+    } else {
+        cout << "NO";
+    }
+    return 0;
+}
