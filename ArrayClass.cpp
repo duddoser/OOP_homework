@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -167,18 +168,80 @@ public:
 
 };
 
+class MySortedArray: public MyArrayChild{
+
+protected:
+    int BinSearch(double value, int left, int right){
+        int middle = (left + right) / 2;
+        if (fabs(ptr[middle] - value) < 0.00000001){
+            return middle;
+        }
+
+        if (right - left <= 1){
+            if (ptr[right] == value)
+                return right;
+            return -1;
+        }
+
+        if (ptr[middle] > value){
+            return BinSearch(value, left, middle - 1);
+        } else {
+            return BinSearch(value, middle + 1, right);
+        }
+    }
+
+    int BinSearch2(double value, int left, int right){
+        int middle = (left + right) / 2;
+        if (fabs(ptr[middle] - value) < 0.00000001){
+            return middle;
+        }
+
+        if (right - left <= 1){
+            if (ptr[right] == value)
+                return right;
+            if (ptr[left] > value){
+                return left;
+            }
+            return right;
+        }
+
+        if (ptr[middle] > value){
+            return BinSearch(value, left, middle - 1);
+        } else {
+            return BinSearch(value, middle + 1, right);
+        }
+    }
+
+public:
+    MySortedArray(int capacity = 1000): MyArrayChild(Capacity()) {}
+    ~MySortedArray() {}
+
+    int IndexOf(double value, bool bFindFromStart = true){
+        return BinSearch(value, 0, count - 1); // тут может быть рассхождение
+    }
+};
+
 int main() {
     //MyArrayParent arr;
     if (true) {
-        MyArrayChild arr;
-        int i = 0;
-        arr.RemoveLastValue();
-        for (i = 0; i < 10; i++) {
-            arr.push(i + 1);
+//        MyArrayChild arr;
+//        int i = 0;
+//        arr.RemoveLastValue();
+//        for (i = 0; i < 10; i++) {
+//            arr.push(i + 1);
+//        }
+//        arr.RemoveLastValue();
+//        arr.InsertAt(8, 3);
+//        arr.print();
+
+        MySortedArray s_arr;
+        for (int i = 0; i < 10; i++) {
+            s_arr.push(i + 4);
         }
-        arr.RemoveLastValue();
-        arr.InsertAt(8, 3);
-        arr.print();
+
+        cout << "bin_searh" << endl;
+        cout << s_arr.IndexOf(5);
+
         cout << "\n";
         //cout << "\n" << sp << "\n";
     }
@@ -186,14 +249,3 @@ int main() {
     cin >> c;
     return 0;
 }
-
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
-
-// Советы по началу работы
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
