@@ -1,0 +1,68 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int64_t phi(int64_t n){
+    int64_t res = n;
+    for (int i = 2; i <= sqrt(n); ++i){
+        if (n % i == 0){
+            res -= res / i;
+            while (n % i == 0) n /= i;
+        }
+    }
+    if (n > 1) res -= res / n;
+    return res;
+}
+
+vector<int64_t> get_dividers(int64_t m){
+    vector<int64_t> dividers;
+    int64_t res = m;
+
+    for (int i = 2; i <= sqrt(m); ++i){
+        if (res % i == 0){
+            int64_t cur = 1;
+
+            while (res % i == 0){
+                res /= i;
+                cur *= i;
+            }
+            dividers.push_back(cur);
+        }
+    }
+
+    if (res != 1){
+        dividers.push_back(res);
+    }
+    return dividers;
+}
+
+int64_t gcd(int64_t a, int64_t b){
+    while (a != b){
+        if (a > b){
+            a -= b;
+        } else {
+            b -= a;
+        }
+    }
+    return a;
+}
+
+int64_t nok(int64_t a, int64_t b){
+    return a * b / gcd(a, b);
+}
+
+int main() {
+    int64_t n; cin >> n;
+    vector<int64_t> dividers = get_dividers(n);
+    vector<int64_t> dividers_phi;
+    int64_t cur_nok = 1;
+
+    for (auto& d: dividers){
+        dividers_phi.push_back(phi(d));
+    }
+
+    for (auto& d: dividers_phi){
+        cur_nok = nok(cur_nok, d);
+    }
+    cout << cur_nok;
+    return 0;
+}

@@ -1,0 +1,58 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int64_t binpow (int64_t a, int64_t n) {
+    int res = 1;
+    while (n > 0)
+        if (n & 1) {
+            res *= a;
+            --n;
+        } else {
+            a *= a;
+            n >>= 1;
+        }
+    return res;
+}
+
+int64_t FactFactor(int n){
+    if (n < 0)
+        return 0;
+    if (n == 0)
+        return 1;
+    if (n == 1 || n == 2)
+        return n;
+    vector<bool> u(n + 1);
+    vector<tuple<int, int>> p; // множители и их показатели степеней
+    for (int i = 2; i <= n; ++i)
+        if (!u[i]) // если i - очередное простое число
+        {
+            // считаем показатель степени в разложении
+            int k = n / i;
+            int c = 0;
+            while (k > 0)
+            {
+                c += k;
+                k /= i;
+            }
+            // запоминаем множитель и его показатель степени
+            p.emplace_back(i, c);
+            // просеиваем составные числа через решето
+            int j = 2;
+            while (i * j <= n)
+            {
+                u[i * j] = true;
+                ++j;
+            }
+        }
+    // вычисляем факториал
+    int64_t r = 1;
+    for (int i = p.size() - 1; i >= 0; --i)
+        r *= binpow(get<0>(p[i]), get<1>(p[i]));
+    return r;
+}
+
+int main() {
+    int k, n; cin >> k >> n;
+    
+    return 0;
+}
