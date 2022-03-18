@@ -1,0 +1,75 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int64_t binpow(int64_t a, int64_t b) {
+    int64_t res = 1;
+    while (b > 0) {
+        if (b & 1) res = res * a;
+        a = a * a;
+        b >>= 1;
+    }
+    return res;
+}
+
+vector<int64_t> get_dividers(int64_t m){
+    vector<int64_t> dividers;
+    int64_t res = m;
+
+    for (int i = 2; i <= sqrt(m); ++i){
+        if (res % i == 0){
+            int64_t cur = 1;
+
+            while (res % i == 0){
+                res /= i;
+                cur *= i;
+            }
+            dividers.push_back(cur);
+        }
+    }
+
+    if (res != 1){
+        dividers.push_back(res);
+    }
+    return dividers;
+}
+
+int64_t gcd(int64_t a, int64_t b){
+    while (a != b){
+        if (a > b){
+            a -= b;
+        } else {
+            b -= a;
+        }
+    }
+    return a;
+}
+
+
+int main() {
+    int64_t n; cin >> n;
+    vector<int64_t> dividers = get_dividers(n);
+    if (dividers.size() == 1) {
+        cout << -1;
+        return 0;
+    }
+
+    int64_t idemp_k = binpow(2, dividers.size()) - 2;
+    int64_t start = 2;
+    vector<int64_t> idempotents;
+
+    while (idemp_k) {
+        if (gcd(n, start) > 1) {
+            if (start * start % n == start) {
+                idempotents.push_back(start);
+                idempotents.push_back((n + 1 - start) % n);
+                idemp_k -= 2;
+            }
+        }
+        start++;
+    }
+
+    sort(idempotents.begin(), idempotents.end());
+    for (auto& i: idempotents) {
+        cout << i << " ";
+    }
+}

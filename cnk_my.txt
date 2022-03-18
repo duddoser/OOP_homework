@@ -1,0 +1,58 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int64_t MOD = 1e9 + 7;
+
+int64_t binpow_mod(int64_t a, int64_t b) {
+    int64_t res = 1;
+    while (b > 0) {
+        if (b & 1) res = res * a % MOD;
+        a = a * a % MOD;
+        b >>= 1;
+    }
+    return res;
+}
+
+vector<pair<int64_t, int64_t>> get_dividers(int64_t n) {
+    vector<pair<int64_t, int64_t>> dividers;
+
+    int64_t d = 2;
+    while (n > 1){
+        int64_t k = 0;
+        while (n % d == 0){
+            n /= d;
+            k++;
+        }
+        dividers.emplace_back(d, k);
+        d++;
+    }
+
+    sort(dividers.begin(), dividers.end());
+    return dividers;
+}
+
+
+int main() {
+    int64_t k, n; cin >> k >> n;
+    vector<pair<int64_t, int64_t>> n_dividers = get_dividers(n);
+    vector<pair<int64_t, int64_t>> k_dividers = get_dividers(k);
+    vector<pair<int64_t, int64_t>> n_k_dividers = get_dividers(n - k);
+
+    int64_t res1 = 1, res2 = 1;
+    for (auto& p: n_dividers){
+        cout << p.first << " " << p.second << endl;
+        res1 *= binpow_mod(p.first, p.second);
+    }
+
+    for (auto& p: k_dividers){
+        res2 *= binpow_mod(p.first, p.second);
+    }
+
+    for (auto& p: n_k_dividers){
+        res2 *= binpow_mod(p.first, p.second);
+    }
+    cout << res1 << endl;
+
+
+    cout << res1 / res2;
+    return 0;
+}
