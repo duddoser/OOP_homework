@@ -1,0 +1,172 @@
+#include <iostream>
+
+using namespace std;
+
+class BaseString
+{
+protected:
+    char* p;
+    int len;
+    int capacity;
+public:
+    BaseString(char* ptr)
+    {
+        for (int i = 0; ptr[i] != '0'; ++i) {
+            len = i + 1;
+        }
+        capacity = len * 4;
+        p = new char[capacity];
+
+        for (int i = 0; i < len; ++i) {
+            p[i] = ptr[i];
+        }
+        p[len] = '\0';
+        cout<<"\nBase Constructor 1\n";
+    }
+
+    BaseString(const char* ptr)
+    {
+        for (int i = 0; ptr[i] != '0'; ++i) {
+            len = i + 1;
+        }
+        capacity = len * 4;
+        p = new char[capacity];
+
+        for (int i = 0; i < len; ++i) {
+            p[i] = ptr[i];
+        }
+        p[len] = '\0';
+        cout<<"\nBase Constructor 1\n";
+
+    }
+
+    BaseString (BaseString& ptr) {
+        capacity = ptr.capacity;
+        len = ptr.len;
+        p = new char[capacity];
+
+        for (int i = 0; i <= len; ++i) {
+            p[i] = ptr[i];
+        }
+    }
+
+    BaseString(int Capacity = 256)
+    {
+        cout<<"\nBase Constructor 0\n";
+        capacity = Capacity;
+        p = new char[capacity];
+        len = 0;
+    }
+
+    ~BaseString()
+    {
+        cout<<"\nBase Destructor\n";
+        if(p!=NULL)
+            delete[] p;
+        len = 0;
+    }
+
+    int Length() {return len;}
+    int Capacity() { return capacity; }
+    //char* get() {return p;}
+    char& operator[](int i) {return p[i];}
+
+
+    BaseString& operator=(BaseString& s)
+    {
+        cout<<"\nBase Operator = \n";
+        // доделать capacity >=  capacity <
+        capacity = max(s.Capacity(), capacity);
+        len = s.Length();
+
+        for (int i = 0; i <= len; ++i){
+            p[i] = s[i];
+        }
+        return *this;
+    }
+
+    virtual void print()
+    {
+        int i=0;
+        while(p[i]!='\0')
+        {
+            cout<<p[i];
+            i++;
+        }
+    }
+};
+
+
+class String: public BaseString {
+public:
+    String(int Capacity = 256) : BaseString(Capacity) {}
+
+    String(char* ptr) : BaseString(ptr) {}
+
+    String(const char* ptr) : BaseString(ptr) {}
+
+    String (String& ptr) {
+        if (capacity >= ptr.Capacity()) {
+
+        } else {
+            delete[] p;
+            p = new char [ptr.capacity];
+        }
+        capacity = ptr.capacity;
+        len = ptr.len;
+        p = new char[capacity];
+
+        for (int i = 0; i <= len; ++i) {
+            p[i] = ptr[i];
+        }
+    }
+
+    String operator+(String& s) {
+        String s_new((s.Length() + len) * 2 >= 256 ? capacity + s.Capacity() : capacity);
+        s_new.len = len + s.Length();
+        for (int i = 0; i < len; ++i) {
+            s_new.p[i] = p[i];
+        }
+
+        for (int i = 0; i <= s.Length(); ++i) {
+            s_new.p[len + i] = s.p[i];
+        }
+        return s_new;
+    }
+
+    int IndexOf(char c) {
+        for (int i = len - 1; i >= 0; ++i) {
+            if (p[i] == c) {
+                return i;
+            }
+        }
+    }
+    ~String() { cout << "\nDestructor String\n";}
+};
+
+int main()
+{
+    if (true)
+    {
+        BaseString s("fafbfd");
+        BaseString s1 = s;
+        String ss("25235");
+        String sss("dfgdfg");
+        String ssss = ss + sss;
+        ssss.print();
+//        String s("test");
+//        s.print();
+//        String s1 = s;
+//        s1.print();
+//        String s2;
+//        s2 = s;
+//        s2 = s + s1;
+//        s2.print();
+//        s1 = s2 + s;
+//        s1.print();
+//        string1.print();
+    }
+    char c; cin>>c;
+    return 0;
+}
+
