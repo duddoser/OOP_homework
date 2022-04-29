@@ -4,21 +4,15 @@ library("dplyr")
 library("car")
 
 
-data <- rlms_read("C:\\Users\\Elizaveta\\Desktop\\desktop\\SRW\\r17i_os26b.sav")
-data2 = select(data, mj13.2, m_age, mh5, m_educ, status, mj6.2, m_marst, mj24, mj26, mj32, mj260)
-# mj32 - есть ли дополнительная работа
-# mj26 - является ли респондент совладельцем предприятия
-# mj260 - владенияе иностранным языком
-
-
-# Задание 1
-
+data <- rlms_read("r19i_os26c.sav")
+data2 = select(data, oj13.2, o_age, oh5, o_educ, status, oj6.2, o_marst, oj24, oj72.51, oj1.1.1, oj6)
+# oj72.51  - Во время обучения в ВУЗе Вы (работали / работаете)? 
+# oj1.1.1 - Насколько Вы удовлетворены или не удовлетворены Вашей работой в целом? 
+# oj6 - Есть ли у респондента подчиненные на этой работе?
 
 # Удалим все строки со значениями NA
 data2 = na.omit(data2)
-
-
-# Преобразование и нормализация данных
+glimpse(data2)
 
 # Зарплата
 sal = as.numeric(data2$mj13.2)
@@ -85,29 +79,31 @@ data2$wed4 = 0
 data2$wed4[which(wed=='5')] <- 1
 data2$wed4 = as.numeric(data2$wed4)
 
-# Является ли респондент совладельцем предприятия
-data2["own"] = as.character(data2$mj26)
-data2["owner"] = 0
-data2$owner[which(data2$own == '1')] <- 1
-data2["owner"] = as.numeric(data2$owner)
-data2$owner
+# Работал ли респондент во время обучения в ВУЗе
+data2["u_work"] = as.character(data2$sj72.51)
+data2["uni_work"] = 1
+data2$uni_work[which(data2$u_work == '4')] <- 0
+data2["uni_work"] = as.numeric(data2$uni_work)
+data2$uni_work
 
-# Наличие второй работы
-data2["sj"] = as.character(data2$mj32)
-data2["second_job"] = 0
-data2$second_job[which(data2$sj == '1')] <- 1
-data2["second_job"] = as.numeric(data2$second_job)
-data2$second_job
+# Насколько респондент удовлетворен или не удовлетворен работой в целом? 
+data2["sat"] = as.character(data2$sj1.1.1)
+data2["work_sat"] = 0
+data2$work_sat[which(data2$sat == '1')] <- 1
+data2$work_sat[which(data2$sat == '2')] <- 1
+data2$work_sat[which(data2$sat == '3')] <- 1
+data2["work_sat"] = as.numeric(data2$work_sat)
+data2$work_sat
 
-# Владение иностранным языком
-data2["lng"] = as.character(data2$mj260)
-data2["language"] = 0
-data2$language[which(data2$lng == '1')] <- 1
-data2["language"] = as.numeric(data2$language)
-data2$language
+# tсть ли у респондента подчиненные на этой работе
+data2["sub"] = as.character(data2$oj6)
+data2["subord"] = 0
+data2$subord[which(data2$sub == '1')] <- 1
+data2["subord"] = as.numeric(data2$subord)
+data2$subord
 
 
-data3 = select(data2, salary, age, sex, higher_educ, status1, dur, wed1, wed2, wed3, wed4, owner, second_job, language)
+data3 = select(data2, salary, age, sex, higher_educ, status1, dur, wed1, wed2, wed3, wed4, uni_work, work_sat, witted)
 
 
 model1 = lm(salary ~ age + sex + higher_educ + status1 + dur + wed1 + wed2 + wed3 + wed4 + owner + second_job + language, data3)
