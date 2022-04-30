@@ -1,0 +1,53 @@
+model4 = lm(salary ~ age + sex + higher_educ + status1 + dur + language + work_sat + subord, data3)   
+	 Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.82031    0.03962 -20.702  < 2e-16 ***
+age         -0.03685    0.01182  -3.118  0.00183 ** 
+sex1         0.39959    0.02380  16.792  < 2e-16 ***
+higher_educ  0.34181    0.02743  12.461  < 2e-16 ***
+status1      0.26526    0.02592  10.234  < 2e-16 ***
+dur          0.12648    0.01191  10.622  < 2e-16 ***
+language     0.25695    0.03039   8.454  < 2e-16 ***
+work_sat     0.22327    0.03588   6.223 5.19e-10 ***
+subord       0.42491    0.02874  14.784  < 2e-16 ***
+
+vif model4
+        age         sex higher_educ     status1         dur    language    work_sat      subord 
+   1.054992    1.055936    1.217518    1.032242    1.071403    1.196564    1.010050    1.074618 
+
+model4 = lm(salary ~I(age^1.3) + sex + higher_educ + status1 + dur + language + work_sat + I(subord^1.8), data3)
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -0.68933    0.05448 -12.652  < 2e-16 ***
+I(age^1.3)    -0.19658    0.02167  -9.073  < 2e-16 ***
+sex1           0.33086    0.03187  10.382  < 2e-16 ***
+higher_educ    0.34692    0.03822   9.078  < 2e-16 ***
+status1        0.30546    0.03409   8.961  < 2e-16 ***
+dur            0.10787    0.01594   6.767 1.58e-11 ***
+language       0.36302    0.04714   7.701 1.82e-14 ***
+work_sat       0.23855    0.04803   4.967 7.19e-07 ***
+I(subord^1.8)  0.38353    0.03781  10.142  < 2e-16 ***
+
+vif model4
+I(age^1.3)           sex   higher_educ       status1           dur      language      work_sat I(subord^1.8) 
+     1.029796      1.043617      1.239023      1.029741      1.073259      1.150228      1.013700      1.084786 
+
+
+1 подмножество
+               Estimate Std. Error t value Pr(>|t|)  
+(Intercept)   -0.222628   0.209300  -1.064    0.291  
+I(age^1.3)    -0.192564   0.103478  -1.861    0.067 .
+sex1           0.127597   0.202559   0.630    0.531  
+higher_educ    0.008076   0.142809   0.057    0.955  
+dur            0.015157   0.071823   0.211    0.833  
+language       0.261403   0.168526   1.551    0.125  
+work_sat       0.188176   0.184672   1.019    0.312  
+I(subord^1.8)  0.269074   0.179738   1.497    0.139 
+
+2 подмножество
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -0.73004    0.13498  -5.409 1.91e-07 ***
+I(age^1.3)    -0.12154    0.06290  -1.932  0.05483 .  
+dur            0.09100    0.05054   1.801  0.07336 .  
+status1        0.18757    0.09876   1.899  0.05907 .  
+language       0.31621    0.17024   1.857  0.06481 .  
+work_sat       0.37601    0.11968   3.142  0.00195 ** 
+I(subord^1.8)  0.35797    0.11529   3.105  0.00220 ** 
