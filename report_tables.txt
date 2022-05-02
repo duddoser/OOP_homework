@@ -1,3 +1,24 @@
+model1 = lm(salary ~ age + sex + higher_educ + status1 + dur + wed1 + wed2 + wed3 + wed4 + language + work_sat + subord, data3)
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.70749    0.13560  -5.217 1.87e-07 ***
+age         -0.04390    0.01305  -3.363 0.000774 ***
+sex1         0.39803    0.02455  16.212  < 2e-16 ***
+higher_educ  0.33711    0.02750  12.260  < 2e-16 ***
+status1      0.26803    0.02599  10.313  < 2e-16 ***
+dur          0.12591    0.01191  10.571  < 2e-16 ***
+wed1        -0.15387    0.13293  -1.158 0.247100    
+wed2        -0.09648    0.13136  -0.734 0.462687    
+wed3        -0.07955    0.13600  -0.585 0.558648    
+wed4        -0.15138    0.13968  -1.084 0.278484    
+language     0.26063    0.03044   8.563  < 2e-16 ***
+work_sat     0.22329    0.03587   6.224 5.15e-10 ***
+subord       0.42119    0.02879  14.630  < 2e-16 ***
+
+vif(model1)
+        age         sex higher_educ     status1         dur        wed1        wed2        wed3        wed4    language    work_sat      subord 
+   1.288075    1.124525    1.223932    1.038244    1.072362   26.219514   31.763749   11.220935    7.712318    1.200316    1.010205    1.078530
+
+
 model4 = lm(salary ~ age + sex + higher_educ + status1 + dur + language + work_sat + subord, data3)   
 	 Estimate Std. Error t value Pr(>|t|)    
 (Intercept) -0.82031    0.03962 -20.702  < 2e-16 ***
