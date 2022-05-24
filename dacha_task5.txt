@@ -1,7 +1,33 @@
 #include <bits\stdc++.h>
 using namespace std;
 
-class Exception: public exception
+
+template<class T>
+class Element {
+protected:
+    T info;
+
+public:
+    Element(T data) {
+        info = data;
+    }
+
+    Element(const Element& el) {
+        info = el.info;
+    }
+
+};
+
+
+template<class T1>
+ostream& operator<<(ostream& s, Element<T1>& el)
+{
+    s << el.info;
+    return s;
+}
+
+
+class Exception : public exception
 {
 protected:
     //сообщение об ошибке
@@ -38,22 +64,22 @@ public:
     //функцию вывода можно будет переопределить в производных классах, когда будет ясна конкретика
     virtual void print()
     {
-        cout << "Exception: " << str<< "; " << what();
+        cout << "Exception: " << str << "; " << what();
     }
 };
 
 
-class UnequalSizeException: public Exception {
+class UnequalSizeException : public Exception {
 protected:
     int rows1, rows2, cols1, cols2;
 
 public:
-    UnequalSizeException(char* s, int rows1, int cols1, int rows2, int cols2): Exception(s) {
+    UnequalSizeException(char* s, int rows1, int cols1, int rows2, int cols2) : Exception(s) {
         this->rows1 = rows1; this->rows2 = rows2; this->cols1 = cols1; this->cols2 = cols2;
 
     }
 
-    UnequalSizeException(const char* s, int rows1, int cols1, int rows2, int cols2): Exception(s) {
+    UnequalSizeException(const char* s, int rows1, int cols1, int rows2, int cols2) : Exception(s) {
         this->rows1 = rows1; this->rows2 = rows2; this->cols1 = cols1; this->cols2 = cols2;
 
     }
@@ -70,17 +96,17 @@ public:
     }
 };
 
-class IndexOutOfBoundException: public Exception {
+class IndexOutOfBoundException : public Exception {
 protected:
     int row_index; int col_index;
 
 public:
-    IndexOutOfBoundException(char* s, int row_index, int col_index): Exception(s) {
+    IndexOutOfBoundException(char* s, int row_index, int col_index) : Exception(s) {
         this->row_index = row_index; this->col_index = col_index;
 
     }
 
-    IndexOutOfBoundException(const char* s, int row_index, int col_index): Exception(s) {
+    IndexOutOfBoundException(const char* s, int row_index, int col_index) : Exception(s) {
         this->row_index = row_index; this->col_index = col_index;
     }
 
@@ -90,51 +116,134 @@ public:
         row_index = e.row_index; col_index = e.col_index;
     }
 
-    virtual void print()
-    {
+    virtual void print() {
         cout << "UnequalSizeException: " << str << "; " << what();
     }
 };
 
 
-class BaseMatrix
-{
+class LargeIndexException : public IndexOutOfBoundException {
+
+public:
+    LargeIndexException(char* s, int row_index, int col_index) :
+            IndexOutOfBoundException(s, row_index, col_index) {}
+
+    LargeIndexException(const char* s, int row_index, int col_index) :
+            IndexOutOfBoundException(s, row_index, col_index) {}
+
+    LargeIndexException(const LargeIndexException& e) : IndexOutOfBoundException(e) {}
+
+    virtual void print() {
+        cout << "LargeIndexException: " << str << "; " << what();
+    }
+};
+
+class NegativeIndexException : public IndexOutOfBoundException {
+
+public:
+    NegativeIndexException(char* s, int row_index, int col_index) :
+            IndexOutOfBoundException(s, row_index, col_index) {}
+
+    NegativeIndexException(const char* s, int row_index, int col_index) :
+            IndexOutOfBoundException(s, row_index, col_index) {}
+
+    NegativeIndexException(const NegativeIndexException& e) : IndexOutOfBoundException(e) {}
+
+    virtual void print() {
+        cout << "NegativeIndexException: " << str << "; " << what();
+    }
+};
+
+
+// исключение тривиальной матрицы
+class TrivialMatrixException : public Exception {
 protected:
-    double** ptr;
+    int height, width;
+
+public:
+    TrivialMatrixException(char* s, int height, int width) : Exception(s) {
+        this->height = height;
+        this->width = width;
+    }
+
+    TrivialMatrixException(const char* s, int height, int width) : Exception(s) {
+        this->height = height;
+        this->width = width;
+    }
+
+    TrivialMatrixException(const TrivialMatrixException& e) {
+        str = new char[strlen(e.str) + 1];
+        strcpy_s(str, strlen(e.str) + 1, e.str);
+        height = e.height;
+        width = e.width;
+    }
+
+    virtual void print()
+    {
+        cout << "TrivialMatrixException: " << str << "; " << what();
+    }
+};
+
+
+class ValueException : public Exception {
+protected:
+
+public:
+    ValueException(char* s) : Exception(s) {}
+
+    ValueException(const char* s) : Exception(s) {}
+
+    ValueException(const ValueException& e) {
+        str = new char[strlen(e.str) + 1];
+        strcpy_s(str, strlen(e.str) + 1, e.str);
+    }
+
+    virtual void print() {
+        cout << "ValueException: " << str << "; " << what();
+    }
+};
+
+
+template<class T>
+class BaseMatrix {
+protected:
+    T** ptr;
     int height;
     int width;
+
 public:
     BaseMatrix(int Height = 2, int Width = 2)
     {
         //конструктор
         height = Height;
         width = Width;
-        ptr = new double* [height];
+        ptr = new T * [height];
         for (int i = 0; i < height; i++)
-            ptr[i] = new double[width];
+            ptr[i] = new T[width];
     }
 
     //конструктор копий
-    BaseMatrix(const BaseMatrix& M) {
+    BaseMatrix(const BaseMatrix<T>& M) {
         height = M.height;
         width = M.width;
-        ptr = new double* [height];
+        ptr = new T * [height];
         for (int i = 0; i < height; i++) {
-            ptr[i] = new double[width];
+            ptr[i] = new T[width];
             for (int j = 0; j < width; ++j) {
                 ptr[i][j] = M.ptr[i][j];
             }
         }
     }
 
-    BaseMatrix& operator=(BaseMatrix const& M) {
+    BaseMatrix<T>& operator=(BaseMatrix<T> const& M) {
         if (height == M.height && width == M.width) {
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; ++j) {
                     ptr[i][j] = M.ptr[i][j];
                 }
             }
-        } else {
+        }
+        else {
             throw UnequalSizeException("Unequal size of matrixes during operator = ",
                                        height, width, M.height, M.width);
         }
@@ -143,57 +252,74 @@ public:
 
     double* operator[](int index) {
         if (index < 0 || index >= height)
-            throw IndexOutOfBoundException("Wrond index in operator[] ", height, -1);
+            throw NegativeIndexException("the given index is negative in operator[]", height, index);
+        if (index >= height)
+            throw LargeIndexException("too large index in operator[]", height, index);
         return ptr[index];
     }
 
     double& operator()(int index1, int index2) {
-        if (index1 < 0 || index1 >= height || index2 < 0 || index2 >= height)
-            throw IndexOutOfBoundException("Wrong index in operator()", index1, index2);
+        if (index1 < 0)
+            throw NegativeIndexException("the given index is negative in operator()", height, index1);
+        if (index2 < 0)
+            throw NegativeIndexException("the given index is negative in operator()", height, index2);
+        if (index1 >= height)
+            throw LargeIndexException("too large index in operator()", height, index1);
+        if (index2 >= height)
+            throw LargeIndexException("too large index in operator()", height, index2);
         return ptr[index1][index2];
     }
 
-    BaseMatrix operator+() { // унарный = транспонирование
-        BaseMatrix res(width, height);
+    BaseMatrix<T> operator+() { // унарный = транспонирование
+        BaseMatrix<T> res(width, height);
         for (int i = 0; i < height; ++i) {
             for (int j = 0; j < width; ++j) {
-                double t = ptr[i][j];
-                res.ptr[i][j] = ptr[j][i];
-                res.ptr[j][i] = t;
+                res.ptr[j][i] = ptr[i][j];
             }
         }
         return res;
     }
 
-    BaseMatrix operator+(double d) {
-        BaseMatrix res(width, height);
-        if (height == width) {
-            for (int i = 0; i < height; ++i) {
-                ptr[i][i] += d;
-            }
-        } else {
-            throw UnequalSizeException("The matrix is not rectangular", height, width, 0, 0);
-        }
-        return res;
-    }
-
-    BaseMatrix operator+(BaseMatrix M) {
-        BaseMatrix res(width, height);
-        if (M.height == height && M.width == width) {
-            for (int i = 0; i < height; ++i) {
-                for (int j = 0; j < width; ++j) {
-                    res.ptr[i][j] = ptr[i][j] + M.ptr[i][j];
+    BaseMatrix<T> operator+(Element<T> d) {
+        if (typeid(d) == typeid(int) || typeid(d) == typeid(float) || typeid(d) == typeid(double)) {
+            BaseMatrix<T> res(width, height);
+            if (height == width) {
+                for (int i = 0; i < height; ++i) {
+                    ptr[i][i] += d;
                 }
             }
-        } else {
-            throw UnequalSizeException("Unequal size of summary of two Matrixes",
-                                       height, width, M.height, M.width);
+            else {
+                throw UnequalSizeException("The matrix is not rectangular", height, width, 0, 0);
+            }
+            return res;
         }
-        return res;
+        else {
+            throw ValueException("Wrong input in operator+");
+        }
     }
 
-    ~BaseMatrix()
-    {
+    BaseMatrix<T> operator+(BaseMatrix<T> M) {
+        BaseMatrix<T> res(width, height);
+        if (typeid(T) == typeid(int) || typeid(T) == typeid(float) || typeid(T) == typeid(double)) {
+            if (M.height == height && M.width == width) {
+                for (int i = 0; i < height; ++i) {
+                    for (int j = 0; j < width; ++j) {
+                        res.ptr[i][j] = ptr[i][j] + M.ptr[i][j];
+                    }
+                }
+            }
+            else {
+                throw UnequalSizeException("Unequal size of summary of two Matrixes",
+                                           height, width, M.height, M.width);
+            }
+            return res;
+        }
+        else {
+            throw ValueException("Wrong type of elements to be summed");
+        }
+    }
+
+    ~BaseMatrix() {
         //деструктор
         if (ptr != NULL)
         {
@@ -215,12 +341,15 @@ public:
         }
     }
 
-    friend ostream& operator<<(ostream& s, BaseMatrix M) ;
-    friend istream& operator>>(istream& s, BaseMatrix& M) ;
+    template<class T1>
+    friend ostream& operator<<(ostream& s, BaseMatrix<T1> M);
 
+    template<class T1>
+    friend istream& operator>>(istream& s, BaseMatrix<T1>& M);
 };
 
-ostream &operator<<(ostream &s, BaseMatrix M) {
+template<class T1>
+ostream& operator<<(ostream& s, BaseMatrix<T1> M) {
     if (typeid(s) == typeid(ofstream)) {
         s << M.height << " " << M.width << " ";
         for (int i = 0; i < M.height; ++i) {
@@ -228,21 +357,25 @@ ostream &operator<<(ostream &s, BaseMatrix M) {
                 s << M.ptr[i][j] << " ";
             }
         }
-    } else {
+    }
+    else {
         for (int i = 0; i < M.height; ++i) {
             for (int j = 0; j < M.width; ++j) {
                 s << M.ptr[i][j] << " ";
             }
             s << endl;
         }
-        return s;
     }
+    return s;
 }
 
-istream &operator>>(istream &s, BaseMatrix& M) {
-    if (typeid(s) == typeid(ofstream)) {
+template<class T1>
+istream& operator>>(istream& s, BaseMatrix<T1>& M) {
+    if (typeid(s) == typeid(ifstream)) {
         int h, w; s >> h >> w;
         if (w != M.width || h != M.height) {
+            
+            // выделить новый участок памяти
             throw UnequalSizeException("Matrixes of unequal sizes while reading file",
                                        h, w, M.height, M.width);
         }
@@ -255,84 +388,74 @@ istream &operator>>(istream &s, BaseMatrix& M) {
     return s;
 }
 
-ostream &mymanip(istream&) {
-    // do what u want
-}
 
-class Matrix: public BaseMatrix {
-    int height, width;
-    double** ptr;
+template<class T>
+class Matrix : public BaseMatrix<T> {
 
 public:
-    Matrix(int Height = 2, int Width = 2) {
-        height = Height;
-        width = Width;
-        ptr = new double* [height];
-        for (int i = 0; i < height; i++)
-            ptr[i] = new double[width];
-        cout << "Matrix constructor" << endl;
-    }
+    Matrix<T>(int Height = 2, int Width = 2) : BaseMatrix<T>(Height, Width) { cout << "Matrix constructor" << endl; }
 
-    Matrix(const Matrix& M) {
-        height = M.height;
-        width = M.width;
-        ptr = new double* [height];
-        for (int i = 0; i < height; i++) {
-            ptr[i] = new double[width];
-            for (int j = 0; j < width; ++j) {
-                ptr[i][j] = M.ptr[i][j];
-            }
-        }
-        cout << "Matrix constructor" << endl;
-    }
+    Matrix<T>(const Matrix<T>& M) : BaseMatrix<T>(M) { cout << "Matrix constructor" << endl; }
 
-    Matrix operator+() { // унарный = транспонирование
-        Matrix res(width, height);
-        for (int i = 0; i < height; ++i) {
-            for (int j = 0; j < width; ++j) {
-                double t = ptr[i][j];
-                res.ptr[i][j] = ptr[j][i];
-                res.ptr[j][i] = t;
+    Matrix<T> operator+() { // унарный = транспонирование
+        Matrix<T> res(BaseMatrix<T>::width, BaseMatrix<T>::height);
+        for (int i = 0; i < BaseMatrix<T>::height; ++i) {
+            for (int j = 0; j < BaseMatrix<T>::width; ++j) {
+                res.ptr[j][i] = BaseMatrix<T>::ptr[i][j];
             }
         }
         return res;
     }
 
-    Matrix getMatrixWithoutZeroes() {
-        int res_height = 0, res_width = 0, cur_height = 0, cur_width = 0;
-        for (int i = 0; i < height; ++i) {
+    void fillUntrivial() {
+        for (int i = 0; i < BaseMatrix<T>::height; ++i) {
+            for (int j = 0; j < BaseMatrix<T>::width; ++j) {
+                BaseMatrix<T>::ptr[i][j] = rand() % 100 + 1;
+            }
+        }
+    }
+
+    Matrix<T> getMatrixWithoutZeroes() {
+        if (!(typeid(T) == typeid(int) || typeid(T) == typeid(float) || typeid(T) == typeid(double))) {
+            throw ValueException("Wrong type of elements: no zeros can be find");
+        }
+        bool trivial = true;
+        for (int i = 0; i < BaseMatrix<T>::height; ++i) {
+            for (int j = 0; j < BaseMatrix<T>::width; ++j) {
+                if (BaseMatrix<T>::ptr[i][j] != 0) trivial = false;
+            }
+        }
+
+        if (trivial) {
+            throw TrivialMatrixException("Current matrix is trivial", BaseMatrix<T>::height, BaseMatrix<T>::width);
+        }
+
+        int res_height = 0, res_width = 0;
+        for (int i = 0; i < BaseMatrix<T>::height; ++i) {
             bool row_flag = false;
-            for (int j = 0; j < width; ++j) {
-                cout << "attemp to get elem ";
-                cout << ptr[i][j] << " " << &ptr[i][j] << endl;
-                if (ptr[i][j] != 0) row_flag = true;
+            for (int j = 0; j < BaseMatrix<T>::width; ++j) {
+                if (BaseMatrix<T>::ptr[i][j] != 0) row_flag = true;
             }
             if (row_flag) res_height++;
         }
 
-        cout << "ok " << res_height << "  " << res_width << endl;
-
-        for (int i = 0; i < width; ++i) {
+        for (int i = 0; i < BaseMatrix<T>::width; ++i) {
             bool col_flag = false;
-            for (int j = 0; j < height; ++j) {
-                if (ptr[j][i] != 0) col_flag = true;
+            for (int j = 0; j < BaseMatrix<T>::height; ++j) {
+                if (BaseMatrix<T>::ptr[j][i] != 0) col_flag = true;
             }
             if (col_flag) res_width++;
         }
 
-        cout << "height " << res_height << "  " << res_width << endl;
-        Matrix result1 = deleteZeroRow(res_height, width, height, *this);
-        cout << result1;
-        cout << endl;
-        Matrix result_t = +result1;
-        cout << result_t;
-        cout << endl;
-        Matrix result2 = deleteZeroRow(res_width, res_height, width, result_t);
+
+        Matrix<T> result1 = deleteZeroRow(res_height, BaseMatrix<T>::width, BaseMatrix<T>::height, *this);
+        Matrix<T> result_t = +result1;
+        Matrix<T> result2 = deleteZeroRow(res_width, res_height, BaseMatrix<T>::width, result_t);
         return +result2;
     }
 
-    Matrix deleteZeroRow(int new_height, int wid, int base_height, Matrix obj) {
-        Matrix new_matrix(new_height, wid);
+    Matrix<T> deleteZeroRow(int new_height, int wid, int base_height, Matrix obj) {
+        Matrix<T> new_matrix(new_height, wid);
         int c_height = 0;
         for (int i = 0; i < base_height; ++i) {
             bool row_flag = false;
@@ -346,47 +469,77 @@ public:
         }
         return new_matrix;
     }
+
+    Matrix<T> operator+(Matrix<T> M) {
+        if (!(typeid(T) == typeid(int) || typeid(T) == typeid(float) || typeid(T) == typeid(double))) {
+            throw ValueException("Wrong type of elements in operator+");
+        }
+        Matrix<T> res(BaseMatrix<T>::width, BaseMatrix<T>::height);
+        if (M.height == BaseMatrix<T>::height && M.width == BaseMatrix<T>::width) {
+            for (int i = 0; i < BaseMatrix<T>::height; ++i) {
+                for (int j = 0; j < BaseMatrix<T>::width; ++j) {
+                    res.ptr[i][j] = BaseMatrix<T>::ptr[i][j] + M.ptr[i][j];
+                }
+            }
+        }
+        else {
+            throw UnequalSizeException("Unequal size of summary of two Matrixes",
+                                       BaseMatrix<T>::height, BaseMatrix<T>::width, M.height, M.width);
+        }
+        return res;
+    }
 };
 
 
 int main()
 {
     try {
-        Matrix M;
+        Matrix<double> M(3, 2);
         M(0, 0) = 0;
         M(0, 1) = 0;
-        M(1, 0) = 9;
-        M(1, 1) = 1;
-        cout << M;
+        M(1, 0) = 0;
+        M(1, 1) = 0;
+        M(2, 0) = 9;
+        M(2, 1) = 0;
 
-        Matrix M1 = M.getMatrixWithoutZeroes();
+        Matrix<double> M1 = M.getMatrixWithoutZeroes();
         cout << M1;
+        Matrix<double> M2;
+        M2.fillUntrivial(); // произвольное нетривиальное заполнение массива
+        cout << M2;
 
+        ofstream fout("test.txt");
+        if (fout) {
+            fout << M;
+            fout.close();
+        }
 
-//        ofstream fout("test.txt");
-//        if (fout) {
-//            fout << M;
-//            fout.close();
-//        }
-//
-//        cout << M;
-//
-//        BaseMatrix M2;
-//        ifstream fin;
-//        fin.open("test");
-//        if (fin) {
-//            fin >> M2;
-//            fin.close();
-//        }
-//        cout << M2;
+        ifstream fin("test.txt");
+        Matrix<double> M_test(3, 2);
+        if (fin) {
+            fin >> M_test;
+            fin.close();
+        }
+        cout << M_test;
 
-//        M(23, 69) = 89;
-//        BaseMatrix M3 = M + M2;
-    } catch (UnequalSizeException e) {
-        e.print();
-    } catch (IndexOutOfBoundException e) {
+        Matrix<double> M_error1;
+        M(0, 0) = 0;
+        M(0, 1) = 0;
+        M(1, 0) = 0;
+        M(1, 1) = 0;
+
+//        M_error1(-7, -9);
+        Matrix<double> M_error2 = M_error1.getMatrixWithoutZeroes();
+        Matrix<double> M_error3 = M + M1;
+    }
+    catch (UnequalSizeException e) {
         e.print();
     }
-
+    catch (IndexOutOfBoundException e) {
+        e.print();
+    }
+    catch (TrivialMatrixException e) {
+        e.print();
+    }
     return 0;
 }
