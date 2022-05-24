@@ -57,6 +57,11 @@ ostream& operator<<(ostream& s, Element<T1>& el)
     return s;
 }
 
+struct Patient {
+    string last_name, name, birth_date, address;
+    int phone_number, card_number, blood_type;
+};
+
 template<class T>
 class LinkedList
 {
