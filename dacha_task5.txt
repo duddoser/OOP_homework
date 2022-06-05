@@ -374,10 +374,15 @@ istream& operator>>(istream& s, BaseMatrix<T1>& M) {
     if (typeid(s) == typeid(ifstream)) {
         int h, w; s >> h >> w;
         if (w != M.width || h != M.height) {
-            delete [] M.ptr;
+            if (M.ptr != NULL) {
+                for (int i = 0; i < M.height; i++)
+                    delete[] M.ptr[i];
+                delete[] M.ptr;
+                M.ptr = NULL;
+            }
             M.height = h;
             M.width = w;
-            M.ptr = new T1 * [h];
+            M.ptr = new T1 *[h];
             for (int i = 0; i < h; i++)
                 M.ptr[i] = new T1[w];
         }
