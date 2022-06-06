@@ -1,0 +1,20 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// на вход подается количество параметров a, далее значение точки х, потом параметры а
+double maclaurin(int n, int x, ...) {
+    int *p = &x;
+    double summary = 0;
+    for (int i = 0; i < n; ++i) {
+        p += 2;
+        summary += pow(x, i) * *p;
+    }
+    return summary;
+}
+
+
+int main() {
+    double a = maclaurin(3, 3, 1, 1, 1);
+    cout << a;
+    return 0;
+}
