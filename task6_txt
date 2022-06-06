@@ -1,0 +1,392 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+template<class T>
+class Element {
+protected:
+    Element* next;
+    Element* prev;
+    T info;
+
+public:
+    Element(T data)
+    {
+        next = prev = NULL;
+        info = data;
+    }
+
+    Element(Element* Next, Element* Prev, T data)
+    {
+        next = Next;
+        prev = Prev;
+        info = data;
+    }
+
+    Element(const Element& el)
+    {
+        next = el.next;
+        prev = el.prev;
+        info = el.info;
+    }
+
+    void setNext(Element* next) {
+        this->next = next;
+    }
+
+    Element* getNext() {
+        return next;
+    }
+
+    void setPrev(Element* prev) { this-> prev = prev; }
+
+    Element* getPrev() { return prev; }
+
+    void setInfo(Element* info) { this->info = info; }
+
+    Element* getInfo() { return info; }
+
+    template<class T1>
+    friend ostream& operator<<(ostream& s, Element<T1>& el);
+
+};
+
+template<class T1>
+ostream& operator<<(ostream& s, Element<T1>& el)
+{
+    s << el.info;
+    return s;
+}
+
+template<class T>
+class LinkedList
+{
+    protected:
+    Element<T>* head;
+    Element<T>* tail;
+    int count;
+
+public:
+    LinkedList()
+    {
+        head = tail = NULL;
+        count = 0;
+    }
+
+    //удалить первый/последний элемент и вернуть удаленное значение
+    virtual Element<T>* pop() = 0;
+    //добавить элемент в список
+    virtual Element<T>* push(T value) = 0;
+    //получить первый/последний элемент списка
+    //virtual Element<T>* front(T value) = 0;
+    //virtual Element<T>* back(T value) = 0;
+
+    //доступ по индексу
+    T& operator[](int index) {
+		//if(index<0 || index>=count) throw ?;
+		Element<T>* current = head;
+
+		for (int i = 0;
+			current != NULL && i < index;
+			current = current->next, i++);
+
+		return current->info;
+	}
+
+    template<class T1>
+    friend ostream& operator<<(ostream& s, LinkedList<T1>& el);
+
+    virtual Element<T>* insert(T value, Element<T>* pred = NULL) {
+        if (LinkedList<T>::head == NULL) {
+            if (pred != NULL) {
+                throw; //придумать
+            }
+            return push(value);
+        }
+
+        Element<T>* newElem = new Element<T>(value);
+        if (pred == NULL) {
+            newElem->setNext(LinkedList<T>::head);
+            LinkedList<T>::head = newElem;
+        } else {
+            newElem->setNext(pred->getNext());
+            pred->setNext(newElem);
+        }
+
+        LinkedList<T>::count++;
+        return newElem;
+    }
+
+//    virtual Element<T>* find(T value) {
+//        Element<T>* p = LinkedList<T>::head;
+//        while (p != NULL) {
+//            if (p->getInfo() == value) {
+//                return p;
+//            }
+//            p = p -> next;
+//        }
+//        return NULL;
+//    }
+//
+//    virtual Element<T>* find_r(T value) {
+//        return find_r(value, LinkedList<T>::head);
+//    }
+//
+//    virtual Element<T>* find_r(T value, Element<T>* current) {
+//        if (current == NULL) return NULL;
+//        if (current -> info == value) return current;
+//
+//        return find_r(value, current -> next);
+//    }
+//
+//    virtual Element<T>* find_r(T key, int (*cmp)(T, T), Element<T>* current) {
+//        if (current == NULL) return NULL;
+//        if (cmp(current -> info, key) == 0) return current;
+//
+//        return find_r(key, cmp, current -> next);
+//    }
+//
+//    virtual Element<T>* find(int (*cmp)(T)) {
+//        Element<T>* current;
+//        for (current = LinkedList<T>::head; current != NULL; current = current -> next) {
+//            if (cmp(current->info) == 1) return current;
+//        }
+//        return NULL;
+//    }
+
+    virtual ~LinkedList() {
+		cout << "\nLinkedList class destructor";
+		if (head != NULL)
+		{
+			Element<T>* current = head;
+			Element<T>* temp = head->getNext();
+			for (; current != tail; current = temp, temp = temp->getNext())
+				delete current;
+		}
+		head = NULL; tail = NULL;
+    }
+
+    void filter(bool (*cmp)(T), LinkedList<T>* dest) {
+        for (Element<T>* current = head; current != NULL; current = current->next) {
+            if (cmp(current -> info)) dest->push(current->info);
+        }
+    }
+};
+
+template<class T1>
+ostream& operator<<(ostream& s, LinkedList<T1>& el){
+    s << "(";
+    Element<T1>* p = el.head;
+    while (p != NULL ) {
+        s << p->getInfo() << ", ";
+        p = p->getNext();
+    }
+    s << ")";
+    return s;
+}
+
+template<class T>
+class Stack : public LinkedList<T> {
+public:
+    Stack() : LinkedList<T>() {}
+
+    virtual Element<T>* operator[](int index) {
+        if (LinkedList<T>::head == NULL) throw;
+        if (index < 0 || index >= LinkedList<T>::count) throw;
+
+        Element<T>* p = LinkedList<T>::head;
+        while (index--) p = p -> getNext();
+        return p;
+    }
+
+    virtual Element<T>* pop() {
+        if (LinkedList<T>::head == NULL) return NULL;
+        Element<T>* result = LinkedList<T>::head;
+
+        if (LinkedList<T>::head == LinkedList<T>::tail) {
+            LinkedList<T>::tail = NULL;
+            LinkedList<T>::head = NULL;
+        } else {
+            Element<T>* p = LinkedList<T>::head;
+            while (p -> getNext() != LinkedList<T>::tail) {
+                p = p -> getNext();
+            }
+
+            p -> setNext(NULL);
+            LinkedList<T>::tail = p;
+        }
+
+        LinkedList<T>::count--;
+        return result;
+    }
+
+    virtual Element<T>* push(T value) {
+        if (LinkedList<T>::tail == NULL) {
+            LinkedList<T>::tail = new Element<T>(value);
+            LinkedList<T>::head = LinkedList<T>::tail;
+        } else {
+            Element<T>* newElem = new Element<T>(value);
+            LinkedList<T>::tail -> setNext(newElem);
+            LinkedList<T>::tail = LinkedList<T>::tail->getNext();
+        }
+        LinkedList<T>::count++;
+        return LinkedList<T>::tail;
+    }
+
+    virtual ~Stack() {
+        cout << "Stack destructor" << endl;
+    }
+
+};
+
+
+template<class T>
+class DoubleSidedStack : public Stack<T>
+{
+	//двусвязный список
+public:
+	DoubleSidedStack() : Stack<T>() { cout << "\nDoubleSidedStackclass constructor"; }
+	virtual ~DoubleSidedStack() { cout << "\nDoubleSidedStack class destructor"; }
+
+	virtual Element<T>* push(T value) {
+		Element<T>* tail_predecessor_push = LinkedList<T>::tail;	//O(1)
+		Element<T>* res = Stack<T>::push(value);	//O(1)
+		res->setPrev(tail_predecessor_push);	//O(1)
+		return res; //O(1)
+	}
+
+	virtual Element<T>* pop() {
+		/*Element<T>* res = Stack<T>::pop();
+		res->prev = NULL;
+		return res;*/
+
+		if (LinkedList<T>::tail == LinkedList<T>::head)
+			return Stack<T>::pop();
+		Element<T>* res = LinkedList<T>::tail;
+		LinkedList<T>::tail = LinkedList<T>::tail->getPrev();
+		LinkedList<T>::tail->setNext(NULL);
+		res->setPrev(NULL);
+		LinkedList<T>::count--;
+		return res;
+	}
+
+	virtual Element<T>* insert(T value, Element<T>* predecessor = NULL)
+	{
+		if (LinkedList<T>::head == NULL)
+			return push(value); //if (predecessor != NULL) throw ...;
+		if (predecessor == NULL)
+		{
+			Stack<T>::insert(value);
+			LinkedList<T>::head->getNext()->setPrev(LinkedList<T>::head);
+			return LinkedList<T>::head;
+		}
+
+		Element<T>* successor = predecessor->getNext();
+		Element<T>* inserted = Stack<T>::insert(value, predecessor);
+		if(predecessor != LinkedList<T>::tail) successor->setPrev(inserted);
+		inserted->setPrev(predecessor);
+		return inserted;
+	}
+
+	template<class T1>
+	friend ostream& operator<<(ostream& s, DoubleSidedStack<T1>& el);
+};
+
+template<class T1>
+ostream& operator<<(ostream& s, DoubleSidedStack<T1>& el)
+{
+	Element<T1>* current;
+	for (current = el.tail; current != NULL; current = current->prev)
+		s << *current << "; ";
+	return s;
+}
+
+
+class my_class {
+public:
+    int data;
+    int key;
+    my_class() { key = 0; data = 1; cout << "\nmy_class default constructor"; }
+    my_class(int k, int v = 0) { key = k;data = v; cout << "\nmy_class constructor";}
+
+    ~my_class() { cout << "\nmy_class destructor"; }
+
+    friend ostream& operator<<(ostream& s, my_class& value);
+};
+
+
+ostream& operator<<(ostream& s, my_class& value)
+{
+    s <<value.key<<", "<< value.data;
+    return s;
+}
+
+
+int compare(my_class m1, my_class m2) {
+    if (m1.key == m2.key) return 0;
+    return m1.key <= m2.key ? -1 : 1;
+}
+
+
+int even(my_class m) {
+    return m.key % 2 == 0 ? 1 : 0;
+}
+
+
+class Patient {
+public:
+    string last_name, name, birth_date, address;
+    int64_t phone_number, card_number, blood_type;
+
+    Patient(string last_name, string name, string birth_date, string address,
+            int64_t phone_number, int64_t card_number, int blood_type) {
+        this->last_name = last_name;
+        this->name = name;
+        this->birth_date = birth_date;
+        this->address = address;
+        this->phone_number = phone_number;
+        this->card_number = card_number;
+        this->blood_type = blood_type;
+    }
+
+    void fillRandom() {
+        last_name = makeRandomString();
+        name = makeRandomString();
+        birth_date = makeRandomString();
+        address = makeRandomString();
+
+        phone_number = 70000000000 + (rand() * rand()) % 10000000000;
+        card_number = 2000000000000000 + (rand() * rand()) % 10000000000000;
+        blood_type = rand() % 5;
+    }
+
+    string makeRandomString() {
+        int n = rand() % 100;
+        string res = "";
+        for (int i = 0; i < n; ++i) {
+            res += char(65 + rand() % 110);
+        }
+        return res;
+    }
+};
+
+
+int main() {
+//    DoubleSidedStack<my_class> S; // его нет
+//    Stack<double> test;
+//    test.push(1);
+//    test.push(2);
+//    test.push(3);
+//    test.insert(2.5, test.head -> next);
+//
+//    int (*cmp_ptr)(my_class);
+//    cmp_ptr = even;
+//    Element<my_class>* p = S.find(cmp_ptr);
+//
+//    Element<double>* ptr = test.pop();
+//    cout << *ptr << endl;
+//    cout << test << endl;
+//    cout << test.find(2) << endl;
+//
+
+    return 0;
+}
