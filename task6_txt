@@ -15,8 +15,7 @@ protected:
     T info;
 
 public:
-    Element(T data)
-    {
+    Element(T data){
         next = prev = NULL;
         info = data;
     }
@@ -699,8 +698,10 @@ public:
     string last_name, name, birth_date, address;
     int64_t phone_number, card_number, blood_type;
 
+    Patient() { }
+
     Patient(string last_name, string name, string birth_date, string address,
-            int64_t phone_number, int64_t card_number, int blood_type) {
+            int64_t phone_number, int card_number, int blood_type) {
         this->last_name = last_name;
         this->name = name;
         this->birth_date = birth_date;
@@ -717,7 +718,7 @@ public:
         address = makeRandomString();
 
         phone_number = 70000000000 + (rand() * rand()) % 10000000000;
-        card_number = 2000000000000000 + (rand() * rand()) % 10000000000000;
+        card_number = rand() % 1000;
         blood_type = rand() % 5;
     }
 
@@ -883,42 +884,41 @@ int main() {
     delete filteredList;
 
     cout << "\n------------------------MY ClASS WORK------------------------------";
-    PatientStack<Patient> patient;
-//    Patient patient1("Kotik", "Bobby", "16.11.1963", "America, Activision", 56784567121, 123, 1);
-//    Patient patient2("Gold", "Asmon", "14.05.1990", "America, Texas", 54783018392, 129, 3);
-//    Patient patient3("Rawr", "Zack", "13.07.1991", "America, Texas, Austin" , 59284718023, 58, 2);
-//    Patient patient4("QC", "X", "14.06.2015", "America, California", 48734650192, 333, 2);
-//    Patient patient5("Tsal", "Vitaliy", "01.06.1987", "Ukraine, Vinitsa", 73450192342, 777, 4);
-//    Patient patients[] = {patient1, patient2, patient3, patient4, patient5};
-//    for (int i = 0; i < 4; i++)
-//        patient.push(patients[i]);
-//
-//    cout << patient << " patient";
-//    cout << endl << "operator[](2): " << *human.operator[](2);
-//    cout << endl << "operator[](0): " << *human.operator[](0);
-//    cout << endl << "pop(): " << *human.pop();
-//    Element<Human>* humanEl = human.find(h4);
-//    cout << endl << "humanEl = find(h4): " << *humanEl;
-//    cout << endl << "find(h2, h4): " << *human.find(h2, humanEl);
-//    cout << human << " human";
-//    human.insert(h5, human.find(h4));
-//    cout << human << " human after insert(h5, find(h4))";
-//    human.remove(h5);
-//    cout << h5;
-//    cout << human << " human after remove(h5)";
-//
-//    LinkedList<Human>* filteredHumanList = new DoubleSidedStack<Human>();
-//
-//    human.filter(g, filteredHumanList);
-//    cout << *filteredHumanList << " filtered human list by my address";
-//
-//    cout << "\n------------------------FILE SAVE/LOAD--------------------------";
-//
-//    human.save("list.txt");
-//    filteredHumanList->load("list.txt");
-//    cout << *filteredHumanList;
-//
-//    delete filteredHumanList;
-//
-//    return 0;
+    PatientStack<Patient> patientStack;
+    Patient patient1("Kotik", "Bobby", "16.11.1963", "America, Activision", 56784567121, 123, 1);
+    Patient patient2("Gold", "Asmon", "14.05.1990", "America, Texas", 54783018392, 129, 3);
+    Patient patient3("Rawr", "Zack", "13.07.1991", "America, Texas" , 59284718023, 58, 2);
+    Patient patient4("QC", "X", "14.06.2015", "America, California", 48734650192, 333, 2);
+    Patient patient5("Tsal", "Vitaliy", "01.06.1987", "Ukraine, Vinitsa", 73450192342, 777, 4);
+    Patient patients[] = {patient1, patient2, patient3, patient4, patient5};
+    for (int i = 0; i < 4; i++)
+        patientStack.push(patients[i]);
+
+    cout << patientStack << " patient";
+
+    cout << endl << "operator[](2): " << *patientStack.operator[](2);
+    cout << endl << "operator[](0): " << *patientStack.operator[](0);
+    cout << endl << "pop(): " << *patientStack.pop();
+    Element<Patient>* patientElement = patientStack.find(patient2);
+    cout << endl << *patientElement;
+    cout << endl << *patientStack.find(patient1, patientElement);
+
+    patientStack.insert(patient5, patientStack.find(patient3));
+    cout << patientStack;
+    patientStack.remove(patient1);
+    cout << patientStack;
+
+    LinkedList<Patient>* patientLinkedList = new DoubleSidedStack<Patient>();
+
+    patientStack.filter(g, patientLinkedList);
+    cout << "PATIENT LINKED LIST AFTER FILTER" << endl;
+    cout << *patientLinkedList;
+
+    cout << "\n------------------------FILE SAVE/LOAD--------------------------";
+
+    patientStack.save("list.txt");
+    patientLinkedList->load("list.txt");
+    cout << *patientLinkedList;
+
+    return 0;
 }
